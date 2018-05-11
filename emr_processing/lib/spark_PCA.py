@@ -29,7 +29,7 @@ def computeCov(RDDin):
     # print 'N=',N
     E=S[0,1:]
     NE=np.float64(N[0,1:])
-    print 'shape of E=',E.shape,'shape of NE=',NE.shape
+    print('shape of E=',E.shape,'shape of NE=',NE.shape)
     Mean=E/NE
     O=S[1:,1:]
     NO=np.float64(N[1:,1:])
@@ -52,5 +52,5 @@ if __name__=="__main__":
 
     #find PCA decomposition
     eigval,eigvec=LA.eig(OUT['Cov'])
-    print 'eigval=',eigval
-    print 'eigvec=',eigvec
+    print('eigval=',eigval)
+    print('eigvec=',eigvec)

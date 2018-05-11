@@ -65,12 +65,12 @@ def init_parser_parameters():
         elif _type=='str': 
             parser=parse_string
         else:
-            print 'unrecognized type',_type
+            print('unrecognized type',_type)
         rule={'name':field[0],
               'start':index,
               'end':index+_len,
               'parser':parser}
-        print field,rule
+        print(field,rule)
         Parse_rules.append(rule)
         index+=_len
 
