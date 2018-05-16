@@ -11,7 +11,7 @@ def unpackArray(x,data_type=np.int16):
     return np.frombuffer(x,dtype=data_type)
 
 def trimmed_spectra(row):
-    return unpackArray(row.MSP,data_type=numpy.float64) #[12:85]
+    return unpackArray(row.MSP,data_type=np.float64) #[12:85]
 
 def init_parser_parameters():
     def parse_date(s):
