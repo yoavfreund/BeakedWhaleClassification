@@ -18,4 +18,13 @@ Data is stored on two buckets in S3
 ## Kait Frasier's method
 [Kate Frasier](https://www.researchgate.net/profile/Kaitlin_Frasier) recently published a new approach for [Automated classification of dolphin echolocation click types](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005823) based on unsupervised network-based classification that has achieved excellent results for classifiying a variety of species.
 
+## Proposed Project Steps
+### Preparatory Steps
+1. Write a high level summary of click descriptions including the following terms: click detector, click spectra, inter-click-interval, click bout, peak-to-peak amplitude, and click time series. 
+2. Perform low level signal processing including click detection and definition of an amplitude threshold, spectral calculations and principal-component-analysis (PCA). 
+
+### Replication of Prior Results
+3. Re-do the notebooks for the Gulf of Mexico beaked whale dataset.
+
+
 
