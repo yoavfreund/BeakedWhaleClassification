@@ -25,6 +25,13 @@ Data is stored on two buckets in S3
 
 ### Replication of Prior Results
 3. Re-do the notebooks for the Gulf of Mexico beaked whale dataset.
+4. Re-write Kate Frasier's code in Python.
+5. Replicate the click type analysis found in Kate's paper (note that only a subset of all the Atlantic species were found in the Gulf of Mexico and visa-versa).
+
+### Possible Direction for Novel Project Analysis
+7. Use the annonated data sets for the DCLDE 2015 and 2018 to discover the full range of sounds present.
+8. Explore alternative unsupervised learning methods.
+9. Explore supervised learning methods such as boosting, and random forest.
 
 
 
