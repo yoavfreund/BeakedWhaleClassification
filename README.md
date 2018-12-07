@@ -23,7 +23,7 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
 
    **[Training and Feature Extraction - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: designs a feature vector which includes **1)PCA projection values of spectra by taking the first 5 eigenvectors,  2) rmse of spectra, 3)peak2peak, and 4)ICI Mode.** The goal is to optimize the prediction accuracy of species with objective function:
 
-   $obj(\theta) = \frac{\sum_y I(y, \hat y)}{\sum_y}$
+   $$obj(\theta) = \frac{\sum_y I(y, \hat y)}{\sum_y}$$
 
    Five classification models are applied to truly detected and correctly classified data samples.
 
