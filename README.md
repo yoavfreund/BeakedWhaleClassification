@@ -12,10 +12,14 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
    **[Data_Processing_Whales.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/DSE230_version/Data_Processing_Whales.ipynb)**: includes a detailed description of echo-location clicks data fields, and some sample plots of waveforms and spectra for both species. **Two species generate different waveforms.** **peak2peak** measures the difference between the max and the min of the wave form. **Spectra** is computed from the waveform using FFT. Applying PCA on spectra, the top 5 eigenvectors explain ~85% variances. Still, Overlaps exist on the projection of top eigenvectors of two species. It is not clear how eigenvectors of spectra can be used to distinguish two species.
 
    >  Q: What could be the interpretation of eigenvectors?
+   
+   >  A: PCA is a dimensionality reduction method. By projecting on the 5 top eigenvectors we introduce a little distortion. Using 5 instead of ~200 dimensions reduces over-fitting.
 
    **[XGBoost_Whales.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/DSE230_version/XGBoost_Whales.ipynb)**: compares the feature's relative importance among first 10 eigen vectors, rmse and peak2peak of spectra, by fitting into an XGBModel. The **first 2-3 eigenvectors** turn out to be the most important, usually assigned at least ~20% more weights.
 
    > Q: How well is XGBModel fitted onto this classification task? What is its accuracy?
+   
+   > A: I don't think the identification of the most important eigen-vectors is significant. The main thing that is significant is the classification error and the ROC curve.
 
    **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: introduces **Interclick Interval(ICI)**, the time difference between two clicks within a given bout. **Two species have obvious differences on the overall distribution of ICI**. **Mode** of ICI has more distinguishable distribution than the median of ICI between two species.
 
@@ -35,6 +39,8 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
    **[Training and Feature Extraction-ICI median.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction-ICI%20median.ipynb)**: uses all same features except for ICI Median instead of ICI Mode. The classification models produce similar performance regrading to prediction accuracy.
 
    > Q: Why ICI Median, which is less representative than Mode, generates similar model?
+   
+   > A: There is no 1-1 relationship between what makes sense and what works. In the majority of cases, making a change that makes sense does not improve performance.
 
    **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: relabels predicted species according to the ratio for each bout, i.e. all clicks in a specific bout are relabeled to the same species. Using all the same features as the first one except for using relabeled predictions. The accuracy on general classification model raises to ~90%.
 
@@ -51,6 +57,8 @@ Data is stored on two buckets in S3
 
 ## Kait Frasier's method
 [Kate Frasier](https://www.researchgate.net/profile/Kaitlin_Frasier) recently published a new approach for [Automated classification of dolphin echolocation click types](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005823) based on unsupervised network-based classification that has achieved excellent results for classifiying a variety of species.
+
+> Yoav: John, we need to add links to Kate's code.
 
 ## Proposed Project Steps
 ### Preparatory Steps
