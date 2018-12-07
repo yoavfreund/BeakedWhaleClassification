@@ -23,7 +23,7 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
 
    **[Training and Feature Extraction - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: designs a feature vector which includes **1)PCA projection values of spectra by taking the first 5 eigenvectors,  2) rmse of spectra, 3)peak2peak, and 4)ICI Mode.** The goal is to optimize the prediction accuracy of species with objective function:
 
-   $$obj(\theta) = \frac{\sum_y I(y, \hat y)}{\sum_y}$$
+   <img src='data/objEqn.gif'>
 
    Five classification models are applied to truly detected and correctly classified data samples.
 
@@ -36,9 +36,7 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
 
    > Q: Why ICI Median, which is less representative than Mode, generates similar model?
 
-   **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**:
-
-   > Q: What does relabeling do?
+   **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: relabels predicted species according to the ratio for each bout, i.e. all clicks in a specific bout are relabeled to the same species. Using all the same features as the first one except for using relabeled predictions. The accuracy on general classification model raises to ~90%.
 
 ## Data
 Data is stored on two buckets in S3
