@@ -32,7 +32,7 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
    | Training Accuracy | 0.8302                    | 0.8303    | 0.8544        | 0.8447        | **0.8574** |
    | Testing Accuracy  | 0.8301                    | 0.8301    | 0.8542        | 0.8445        | **0.8572** |
 
-   **[Training and Feature Extraction-ICI median.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction-ICI%20median.ipynb)**: uses all same features except for ICI Median instead of ICI Mode. The classification gives similar performance for five different models.
+   **[Training and Feature Extraction-ICI median.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction-ICI%20median.ipynb)**: uses all same features except for ICI Median instead of ICI Mode. The classification models produce similar performance regrading to prediction accuracy.
 
    > Q: Why ICI Median, which is less representative than Mode, generates similar model?
 
