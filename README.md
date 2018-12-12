@@ -42,9 +42,25 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
 Data is stored on two buckets in S3
 
 1. `s3://gulf-whales`: Contains underwaters sound clips of echolocation clicks from two kinds of beaked whales (Cuvier's and Gervais') that were recorded in the Gulf of Mexico after the Deepwater Horizon oil spill. The goal is a binary classification that separates these two species.
+
    * [Two page description](https://docs.google.com/document/d/1GYivLB5e4xM-URTivAGFOqcjyXp-Ay8s_fyRSTcHvL0/edit#heading=h.lnna1gml3l15)
 
+   Terms:
+
+   - Click detector: devices with algorithm filters that identify impulse signals to detect echolocation clicks.
+
+   - Click spectra: click pressure level as a function of frequency, is computed from the click waveform using FFT.
+
+   - Inter-click-interval: the time difference between two clicks.
+
+   - Click bout: the clicks can be separated into "bouts" of clicks, where each bout usually corresponds to a single species.
+
+   - Peak-to-peak amplitude: the difference between the max and the min of the wave form.
+
+   - Click time series: an interval of click waveform, which is transformed to click spectra using discrete Fourier transform (DFT). Certain samples before and after each detected click were included in the click time series.
+
 2. `s3://hdsi-whales`: 4TB of sound data from the Pacific Ocean and 4TB of data from the Atlantic Ocean which were annotated for whale and dolphin sounds for the Marine Mammal Detection, Classification, Localization and Density Estimation Workshops (DCLDE) that were conducted in: 
+
    * 2015 [7th International DCLDE](http://www.cetus.ucsd.edu/dclde/) which is based on marine mammal sounds in the **Pacific**  
    * 2018 [8th International DCLDE](http://sabiod.univ-tln.fr/DCLDE/) which is based on marine mammal sounds in the **Atlantic** 
    * Listing of files is in `hdsi-whales.ls`
