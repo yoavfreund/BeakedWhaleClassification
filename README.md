@@ -1,4 +1,5 @@
-# WhaleClassification
+# .WhaleClassification
+
 Project whose goal is the automatic classification of Whales and Dolphins from recordings of their underwater sounds.  Toothed whales production sterotyped [echolocation clicks](https://en.wikipedia.org/wiki/Animal_echolocation#Toothed_whales) and baleen whales produce sounds that are sometimes called [songs](https://en.wikipedia.org/wiki/Whale_vocalization).  Examples of whale and dolphin sounds can be found at the [Voices in the Sea](http://cetus.ucsd.edu/voicesinthesea_org/). 
 
 ## Notebooks
@@ -11,11 +12,7 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
 
    **[Data_Processing_Whales.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/DSE230_version/Data_Processing_Whales.ipynb)**: includes a detailed description of echo-location clicks data fields, and some sample plots of waveforms and spectra for both species. **Two species generate different waveforms.** **peak2peak** measures the difference between the max and the min of the wave form. **Spectra** is computed from the waveform using FFT. Applying PCA on spectra, the top 5 eigenvectors explain ~85% variances. Still, Overlaps exist on the projection of top eigenvectors of two species. It is not clear how eigenvectors of spectra can be used to distinguish two species.
 
-   >  Q: What could be the interpretation of eigenvectors?
-
    **[XGBoost_Whales.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/DSE230_version/XGBoost_Whales.ipynb)**: compares the feature's relative importance among first 10 eigen vectors, rmse and peak2peak of spectra, by fitting into an XGBModel. The **first 2-3 eigenvectors** turn out to be the most important, usually assigned at least ~20% more weights.
-
-   > Q: How well is XGBModel fitted onto this classification task? What is its accuracy?
 
    **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: introduces **Interclick Interval(ICI)**, the time difference between two clicks within a given bout. **Two species have obvious differences on the overall distribution of ICI**. **Mode** of ICI has more distinguishable distribution than the median of ICI between two species.
 
@@ -34,33 +31,14 @@ Project whose goal is the automatic classification of Whales and Dolphins from r
 
    **[Training and Feature Extraction-ICI median.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction-ICI%20median.ipynb)**: uses all same features except for ICI Median instead of ICI Mode. The classification models produce similar performance regrading to prediction accuracy.
 
-   > Q: Why ICI Median, which is less representative than Mode, generates similar model?
-
    **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: relabels predicted species according to the ratio for each bout, i.e. all clicks in a specific bout are relabeled to the same species. Using all the same features as the first one except for using relabeled predictions. The accuracy on general classification model raises to ~90%.
 
 ## Data
 Data is stored on two buckets in S3
 
 1. `s3://gulf-whales`: Contains underwaters sound clips of echolocation clicks from two kinds of beaked whales (Cuvier's and Gervais') that were recorded in the Gulf of Mexico after the Deepwater Horizon oil spill. The goal is a binary classification that separates these two species.
-
    * [Two page description](https://docs.google.com/document/d/1GYivLB5e4xM-URTivAGFOqcjyXp-Ay8s_fyRSTcHvL0/edit#heading=h.lnna1gml3l15)
-
-   Terms:
-
-   - Click detector: devices with algorithm filters that identify impulse signals to detect echolocation clicks.
-
-   - Click spectra: click pressure level as a function of frequency, is computed from the click waveform using FFT.
-
-   - Inter-click-interval: the time difference between two clicks.
-
-   - Click bout: the clicks can be separated into "bouts" of clicks, where each bout usually corresponds to a single species.
-
-   - Peak-to-peak amplitude: the difference between the max and the min of the wave form.
-
-   - Click time series: an interval of click waveform, which is transformed to click spectra using discrete Fourier transform (DFT). Certain samples before and after each detected click were included in the click time series.
-
 2. `s3://hdsi-whales`: 4TB of sound data from the Pacific Ocean and 4TB of data from the Atlantic Ocean which were annotated for whale and dolphin sounds for the Marine Mammal Detection, Classification, Localization and Density Estimation Workshops (DCLDE) that were conducted in: 
-
    * 2015 [7th International DCLDE](http://www.cetus.ucsd.edu/dclde/) which is based on marine mammal sounds in the **Pacific**  
    * 2018 [8th International DCLDE](http://sabiod.univ-tln.fr/DCLDE/) which is based on marine mammal sounds in the **Atlantic** 
    * Listing of files is in `hdsi-whales.ls`
