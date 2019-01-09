@@ -44,6 +44,7 @@ Data is stored on two buckets in S3
    * Listing of files is in `hdsi-whales.ls`
 
 ## Kait Frasier's method
+
 [Kate Frasier](https://www.researchgate.net/profile/Kaitlin_Frasier) recently published a new approach for [Automated classification of dolphin echolocation click types](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005823) based on unsupervised network-based classification that has achieved excellent results for classifiying a variety of species.
 
 ## Proposed Project Steps
