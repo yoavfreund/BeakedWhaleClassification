@@ -47,10 +47,10 @@ The goal is to find the best click type match, among seven click types that were
 
 ~~~
 FOR each test summary node Ci
-		FOR each click type Tj
-				compute the spectrum and modal ICI for Ci
-				compare Ci to all nodes in click type Tj based on the similarity  
-		ENDFOR
+	FOR each click type Tj
+		compute the spectrum and modal ICI for Ci
+		compare Ci to all nodes in click type Tj based on the similarity  
+	ENDFOR
 		obtain a similarity metric
 		assign test node Ci to click type Tj
 ENDFOR
