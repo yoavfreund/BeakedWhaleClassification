@@ -1,3 +1,9 @@
+## Clicks:
+
+Toothed whales use clicks for echolocation, such as sensing surroundings and detecting predators. The clicks can be separated into “runs/bouts” of clicks, with each click bout usually corresponding to a single species. Different species of beaked whales emit clicks with different waveforms and spectral distributions, where click spectrum is computed from the waveform within a given specific click time series using DFT. Some exploratory analysis also suggests that inter-click-interval provides distinguishable information across different species. Another information, peak-to-peak amplitude, is also extracted from the click waveform (not sure why).
+
+The clicks data comes from five click detectors located in Gulf of Mexico at three continental slope and two shelf locations between 2010 and 2012. The goal is classifying Whales and Dolphins from recordings of their underwater echo-location clicks. 
+
 ## Terms:
 
 - **Click detector:** devices with algorithm filters that identify impulse signals to detect echolocation clicks.
@@ -67,4 +73,3 @@ ENDFOR
 3. True of False? Classification in testing data also requires phase 1 which produces summary nodes, and then match those summary nodes to click types found in training data.
 
 4. True of False? The method classifies a cluster of nodes(summary node) to one the seven click types, instead of classifying every node to one click type in testing data. 
-
