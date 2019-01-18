@@ -73,3 +73,20 @@ ENDFOR
 3. True of False? Classification in testing data also requires phase 1 which produces summary nodes, and then match those summary nodes to click types found in training data.
 
 4. True of False? The method classifies a cluster of nodes(summary node) to one the seven click types, instead of classifying every node to one click type in testing data. 
+
+5. What could be the interpretation of `Margin Score`? Why the crossing point is near margin score = 0?
+
+6. What are the drawbacks of abstaining crossing area between two species in order to achieve high prediction accuracy?
+
+7. The `Bootstrap Analysis`?
+
+## Problems:
+
+1. Access to S3 data
+2. Access to some computational nodes for Spark?
+3. Could not reproduce the same spectra from waveform using FFT in clicks data, while some simple examples work. 
+4.  peak2peak does not equal to difference between the max and the min of the wave form
+
+## Next:
+
+1. Experience some XGBoost models?
