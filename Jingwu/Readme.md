@@ -68,17 +68,24 @@ ENDFOR
 
    In Phase 1, the average number of automatically identified clusters per time bin ranged from 1.02 to 1.14 (CV = 0.14 and 0.35 respectively) across sites and deployments (Table 2). 
 
-2. How does the method classify isolated clicks(nodes) during clustering from phase 1 or 2?
+2. True of False? In training data, we first generate summary nodes following phase1, and then cluster those summary nodes into 7 major click types. In testing data, we first generate summary nodes following phase1, and then match those summary node into one of the click type that we found using training data.
 
-3. True of False? Classification in testing data also requires phase 1 which produces summary nodes, and then match those summary nodes to click types found in training data.
+3. Instead of doing clustering in phase1, where we isolated small portion (7.4%) of nodes, to get a summary node, could we just use the modal of all nodes (excluding outliers) to be the summary node? What could be the trade off between runtime and accuracy?
 
-4. True of False? The method classifies a cluster of nodes(summary node) to one the seven click types, instead of classifying every node to one click type in testing data. 
+   - For the cases where a bin has more than 2 clusters, we try to treat it as one cluster because first its not common (5.7%), second it should not affect too much.
+   - For the cases where a bin has more than 5000 nodes, we can split it into k bags, where which bag selects its own summary node
 
-5. What could be the interpretation of `Margin Score`? Why the crossing point is near margin score = 0?
+> The reason for doing this is phase 1 is basically producing one summary node per bin, where almost all nodes are preserved. While phase 2 is actually where CW algorithm do have the effects of clustering nodes (into 7 categories).
 
-6. What are the drawbacks of abstaining crossing area between two species in order to achieve high prediction accuracy?
+4. Why phase 1 uses (only) the spectra of echolocation clicks as weighting/scoring matrix?
 
-7. The `Bootstrap Analysis`?
+   Would cooperating with other features (like p2p) helps generate better weighting matrix that leads to better summary node here? 
+
+5. Can we extract more information from summary node that helps the clustering in phase2? Such as summary cluster variance, summary cluster confidence or widest difference within summary cluster (like spectra energy of a species usually comes with a range, the range of summary cluster may be helpful here)?
+
+6. In phase 2, does other information, like click time, detection location, sequential relationship between bins(summary node), could be joined into the scoring matrix to get better performance? `S2 = S_ICI 􏰛 * S_SPEC ` --> `S2 = f(S1, S2, S3, ... S_i)`
+
+7. `Types that were predominantly restricted to shallow sites`. Could the type variance is largely caused by the shallow sites noise? (Apart from obvious false positive samples we removed beforehand)
 
 ## Problems:
 
@@ -87,6 +94,10 @@ ENDFOR
 3. Could not reproduce the same spectra from waveform using FFT in clicks data, while some simple examples work. 
 4.  peak2peak does not equal to difference between the max and the min of the wave form
 
-## Next:
+## Milestone:
 
-1. Experience some XGBoost models?
++ 1/21 - 1/25
+  + Study FFT
+  + Further read the paper
+  + Experiments with basic signal processing methods
+  + Plan to start to project
