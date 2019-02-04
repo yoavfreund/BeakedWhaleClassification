@@ -87,6 +87,11 @@ ENDFOR
 
 7. `Types that were predominantly restricted to shallow sites`. Could the type variance is largely caused by the shallow sites noise? (Apart from obvious false positive samples we removed beforehand)
 
+
+
+1. How to synchronize reading and processing wav files in Python?
+2. I couldn't regenerate the same LR results from XWAV file that Kait provided.
+
 ## Problems:
 
 1. Access to S3 data
@@ -101,3 +106,8 @@ ENDFOR
   + Further read the paper
   + Experiments with basic signal processing methods
   + Plan to start to project
++ 1/26 - 2/3
+  + Met with Kait, John and Yoav, discussed project overview
+  + Read through Kait's code about detector, replayed her code in Matlab
+  + Further read on [AudioFiltering.ipynb](https://github.com/calebmadrigal/FourierTalkOSCON/blob/master/09_AudioFiltering.ipynb)
+  + Started translating code into python, (processing header)
