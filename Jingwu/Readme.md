@@ -111,3 +111,7 @@ ENDFOR
   + Read through Kait's code about detector, replayed her code in Matlab
   + Further read on [AudioFiltering.ipynb](https://github.com/calebmadrigal/FourierTalkOSCON/blob/master/09_AudioFiltering.ipynb)
   + Started translating code into python, (processing header)
++ 2/3 - 2/10
+  + Get runnable file samples from Kait. (tf is important here)
+  + Translated code (finished Header, LR, HR)
+  + [Q] Ask prof. how to parallel things
