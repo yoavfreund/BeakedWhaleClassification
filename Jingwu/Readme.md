@@ -92,12 +92,36 @@ ENDFOR
 1. How to synchronize reading and processing wav files in Python?
 2. I couldn't regenerate the same LR results from XWAV file that Kait provided.
 
-## Problems:
 
-1. Access to S3 data
-2. Access to some computational nodes for Spark?
-3. Could not reproduce the same spectra from waveform using FFT in clicks data, while some simple examples work. 
-4.  peak2peak does not equal to difference between the max and the min of the wave form
+
+## Detector
+
+**Terms:**
+
+Count: the raw measurement from the sensor
+
+Low Resolution: First pass which detect many candidates which above a certain threshold
+
+High Resolution: Second pass which filters out candidates
+
+**Workflow:**
+
+1. read params(settings)
+2. read header
+3. build filter
+4. bandpass data 
+   - this is actually high pass, where threshold is **5000** Hz
+5. calculate threshold
+   - Is this fixed by setting params, or is there a calculation?
+6. LR (First pass): extract click candidates by thresholding the filtered signal
+   - Is there max-min(p2p) calculation involved?
+7. HR (Second pass) expand click region
+   - It seems this is done using iterative expansion, is that really necessary or can we just take a window of fixed size window around the detected peak. Yoav suggests this will be faster and the steps making the window are not symmetric or merging peaks can be done afterwards, because all of the relevant information is kept and only things that are far from the peak are eliminated.
+8. prune out candidate, remove windows where peaks are too high
+9. compute params
+   - large number of params are computed for each window 
+   - Is it possible to restrict this step to computing params that are only currently used by Kait to collect clicks (or say for classification use).
+   - 
 
 ## Milestone:
 
