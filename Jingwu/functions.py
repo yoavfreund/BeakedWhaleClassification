@@ -3,6 +3,7 @@ from __future__ import division
 import os
 import math
 import numpy as np
+import pickle
 from scipy import signal
 from scipy.interpolate import interp1d
 
@@ -75,7 +76,7 @@ def fn_getFileset(directory, fullFileNames):
         xfile = fullFileNames[i]
         fname = os.path.basename(xfile)
         pureName = os.path.splitext(os.path.splitext(fname)[0])[0]
-        fullLabels[i] = os.path.join(directory, pureName+'.c')
+        fullLabels[i] = os.path.join(directory, pureName+'.txt')
     return fullLabels
 
 def fn_interp_tf(params):
@@ -161,3 +162,45 @@ def fn_fastSmooth(Y, w, stype=1, ends=0):
     elif stype == 3:
         SmoothY=sa(sa(sa(Y,w,ends),w,ends),w,ends)
     return SmoothY
+
+def fn_saveDets2pkl(fileName, cParams, f, hdr, params):
+    
+    def anomyousClass_to_dict(anonymousClass):
+        # [TODO] a alternative way to dump anonymousClass
+        # 1. better way to use pickle dump
+        # 2. change the structure of storage, like dict
+        anonymousDict = dict()
+        for key, value in vars(anonymousClass).items():
+            if hasattr(value,'__dict__') or hasattr(value,'__slots__'):
+                anonymousDict[key] = anomyousClass_to_dict(value)
+            else:
+                anonymousDict[key] = value
+        return anonymousDict
+
+    # Can't save directly in parfor loop, so save externally    
+    clickTimes = cParams.clickTimes
+    ppSignal = cParams.ppSignalVec
+    yFiltBuff = cParams.yFiltBuffVec
+    specClickTf = cParams.specClickTfVec
+    yNFilt = cParams.yNFiltVec
+    if params.saveForTPWS: # only save what you need to build a TPWS file
+        with open(fileName, 'wb') as fw:
+            pickle.dump([clickTimes, ppSignal, f, anomyousClass_to_dict(hdr),
+                         specClickTf, yFiltBuff, anomyousClass_to_dict(params)], fw)
+            if params.saveNoise:
+                pickle.dump([yNFilt], fw)
+    else:
+        durClick = cParams.durClickVec
+        nDur = cParams.nDurVec
+        deltaEnv = cParams.deltaEnvVec
+        bw3db = cParams.bw3dbVec
+        yFilt = cParams.yFiltVec
+        peakFr = cParams.peakFrVec
+        with open(fileName, 'wb') as fw:
+            pickle.dump([clickTimes, ppSignal, durClick, f, anomyousClass_to_dict(hdr), 
+                         nDur, deltaEnv, bw3db, yFilt, specClickTf, peakFr,yFiltBuff, 
+                         anomyousClass_to_dict(params)], fw)
+            if params.saveNoise:
+                yNFilt = cParams.yNFiltVec
+                specNoiseTf = cParams.yNFiltVec
+                pickle.dump([yNFilt, specNoiseTf], fw)

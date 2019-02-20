@@ -104,24 +104,39 @@ Low Resolution: First pass which detect many candidates which above a certain th
 
 High Resolution: Second pass which filters out candidates
 
+> High resolution step also more accurately identifies detection starts and ends.
+
 **Workflow:**
 
 1. read params(settings)
 2. read header
 3. build filter
 4. bandpass data 
+
    - this is actually high pass, where threshold is **5000** Hz
+
+   > The filtering needs vary by use case. I generally only use a high pass, but people often use a band pass to more narrowly focus their detections on target signals and reduce false positives. 
 5. calculate threshold
+
    - Is this fixed by setting params, or is there a calculation?
+
+   > Either. It was originally specified in params, and still can be in my code, but I think it is better to calculate it automatically based on the desired received level in dB. This is a little hard if we are using a very wide detection band (like a 5 kHz high pass) because the sensor frequency response is not totally flat. Depending on what transfer function value you use to convert to counts, you can get very different answers. Ideally you would use the minimum transfer function value, but if you do that, you get way too many detections to handle, so I have generally selected the mean or median transfer function value across the band of interest.
 6. LR (First pass): extract click candidates by thresholding the filtered signal
+
    - Is there max-min(p2p) calculation involved?
+
+   > No, this is just based on energy (signal^2) peaks exceeding the counts threshold
 7. HR (Second pass) expand click region
+
    - It seems this is done using iterative expansion, is that really necessary or can we just take a window of fixed size window around the detected peak. Yoav suggests this will be faster and the steps making the window are not symmetric or merging peaks can be done afterwards, because all of the relevant information is kept and only things that are far from the peak are eliminated.
+
+   > I think we could just take a fixed window, but we should think about what happens if there are more than one signals in the window. The optimal window size would change based on the signal (e.g. longer for beaked whales, shorter for dolphins). So if we use a long window, then we are potentially batching signals and under-counting detections. A short window might cut signals off. So it's not immediately clear to me what the best solution there would be. At the very least, the window length should be modifiable by the user.
 8. prune out candidate, remove windows where peaks are too high
 9. compute params
    - large number of params are computed for each window 
    - Is it possible to restrict this step to computing params that are only currently used by Kait to collect clicks (or say for classification use).
-   - 
+
+   > Yes. We talked about this a little before, but the things we use later are detection times, waveforms, peak2peak amplitudes, and spectra
 
 ## Milestone:
 

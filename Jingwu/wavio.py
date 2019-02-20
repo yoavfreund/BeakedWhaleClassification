@@ -11,7 +11,7 @@ from datetime import datetime
 from datetime import timedelta
 
 def io_readXWavHeader(filename):
-    hdr = type('Header',(object,),{})()
+    hdr = type('AnonymousClass',(object,),{})()
     hdr.fType = 'xwav'
 
     with open(filename, 'rb') as fh:
@@ -20,7 +20,7 @@ def io_readXWavHeader(filename):
         ##################################################
         riff, size, fformat = struct.unpack('4sI4s', fh.read(12))
 
-        hdr.xhd = type('xhd',(object,),{})()
+        hdr.xhd = type('AnonymousClass',(object,),{})()
 
         hdr.xhd.ChunkID   = riff    # "RIFF"
         hdr.xhd.ChunkSize = size    # File size - 8 bytes
@@ -50,7 +50,7 @@ def io_readXWavHeader(filename):
 
         hdr.nBits = hdr.xhd.BitsPerSample       # # of Bits per Sample : 8bit = 8, 16bit = 16, etc
 
-        hdr.samp = type('sample',(object,),{})()
+        hdr.samp = type('AnonymousClass',(object,),{})()
         hdr.samp.byte = math.floor(hdr.nBits/8)      # # of Bytes per Sample
 
         ##################################################
@@ -84,7 +84,7 @@ def io_readXWavHeader(filename):
         #####################################################
         # write sub-sub chunk
         #####################################################
-        hdr.raw = type('raw',(object,),{})()
+        hdr.raw = type('AnonymousClass',(object,),{})()
         hdr.xhd.year,         hdr.xhd.month,        hdr.xhd.day,        hdr.xhd.hour\
         ,hdr.xhd.minute,      hdr.xhd.secs,         hdr.xhd.ticks,      hdr.xhd.byte_loc\
         ,hdr.xhd.byte_length, hdr.xhd.write_length, hdr.xhd.sample_rate,hdr.xhd.gain\
@@ -143,16 +143,16 @@ def io_readXWavHeader(filename):
 
         # vectors (NumOfWrites)
         hdr.xgain = hdr.xhd.gain[0];            # gain (1 = no change)
-        hdr.start = type('start',(object,),{})()
+        hdr.start = type('AnonymousClass',(object,),{})()
         hdr.start.dnum = hdr.raw.dnumStart[0]
         hdr.start.dvec = hdr.raw.dvecStart[0]
-        hdr.end = type('start',(object,),{})()
+        hdr.end = type('AnonymousClass',(object,),{})()
         hdr.end.dnum = hdr.raw.dnumEnd[hdr.xhd.NumOfRawFiles-1]
     return hdr
 
 def io_readWavHeader(filename, dateRegExp):
         
-    hdr = type('Header',(object,),{})()
+    hdr = type('AnonymousClass',(object,),{})()
     hdr.fType = 'wav'
 
     with open(filename, 'rb') as fh:
@@ -194,10 +194,10 @@ def io_readWavHeader(filename, dateRegExp):
         hdr.nch   = hdr.Chunks[hdr.fmtChunk].Info.nChannels;
         hdr.nBits = hdr.Chunks[hdr.fmtChunk].Info.nBytesPerSample * 8;
         
-        hdr.samp = type('sample',(object,),{})()
+        hdr.samp = type('AnonymousClass',(object,),{})()
         hdr.samp.byte = hdr.Chunks[hdr.fmtChunk].Info.nBytesPerSample;
         
-        hdr.xhd = type('',(object,),{})()
+        hdr.xhd = type('AnonymousClass',(object,),{})()
         hdr.xhd.ByteRate    = hdr.Chunks[hdr.fmtChunk].Info.nBlockAlign * hdr.fs;
         hdr.xhd.byte_length = hdr.Chunks[hdr.dataChunk].DataSize;
         hdr.xhd.byte_loc    = hdr.Chunks[hdr.dataChunk].DataStart;
@@ -210,7 +210,7 @@ def io_readWavHeader(filename, dateRegExp):
         pureName = os.path.splitext(os.path.splitext(filename)[0])[0]
         catDate = re.search(dateRegExp, pureName).group(0).replace('_','')
         
-        hdr.start = type('',(object,),{})()
+        hdr.start = type('AnonymousClass',(object,),{})()
         if len(catDate) == 12:
             hdr.start.dvec = [int(catDate[:2])+2000, int(catDate[2:4]), int(catDate[4:6]),\
                           int(catDate[6:8]), int(catDate[8:10]), int(catDate[10:12])]
@@ -233,13 +233,13 @@ def io_readWavHeader(filename, dateRegExp):
         hdr.start.dnum = date.toordinal(dtime)+366
 
         samplesN = hdr.xhd.byte_length / (hdr.nch * hdr.samp.byte)
-        hdr.end = type('',(object,),{})()
+        hdr.end = type('AnonymousClass',(object,),{})()
         hdr.end.dnum = date.toordinal(dtime + timedelta(seconds=samplesN/hdr.fs))+366
     return hdr
 
 def io_readRIFFCkHdr(fh):
     # [TODO] handle EOF
-    Chunk = type('Chunk',(object,),{})()
+    Chunk = type('AnonymousClass',(object,),{})()
     Chunk.StartByte = fh.tell()
     Chunk.ID = struct.unpack('4s', fh.read(4))[0]
     HeaderSize = 8  # Oy vay - Magic
@@ -252,7 +252,7 @@ def io_readRIFFCkHdr(fh):
 def io_readRIFFCk_fmt(fh):
     # Given a handle to a file positioned at the first data byte
     # of a RIFF format chunk, read the format information.
-    Fmt = type('Fmt',(object,),{})()
+    Fmt = type('AnonymousClass',(object,),{})()
     # Data encoding format
     Fmt.wFormatTag      = struct.unpack('H', fh.read(2))[0]
     # Number of channels
@@ -264,7 +264,7 @@ def io_readRIFFCk_fmt(fh):
     # Block alignment
     Fmt.nBlockAlign     = struct.unpack('H', fh.read(2))[0]
     
-    Fmt.fmt = type('fmt',(object,),{})()
+    Fmt.fmt = type('AnonymousClass',(object,),{})()
     if Fmt.wFormatTag == 1:
         # PCM Format
         Fmt.fmt.nBitsPerSample = struct.unpack('H', fh.read(2))[0]
