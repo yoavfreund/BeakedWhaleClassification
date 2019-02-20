@@ -154,3 +154,7 @@ High Resolution: Second pass which filters out candidates
   + Get runnable file samples from Kait. (tf is important here)
   + Translated code (finished Header, LR, HR)
   + [Q] Ask prof. how to parallel things
++ 2/10-2/18
+  + Finished majority translation from .m to .py
+  + Got runnable program and similar results
+  + Investigated on the time cost for each function 
