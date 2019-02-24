@@ -158,3 +158,6 @@ High Resolution: Second pass which filters out candidates
   + Finished majority translation from .m to .py
   + Got runnable program and similar results
   + Investigated on the time cost for each function 
++ 2/18-2/23
+  + 2nd check on the click detector outputs
+  + Finished the code organization, with runnable py file
