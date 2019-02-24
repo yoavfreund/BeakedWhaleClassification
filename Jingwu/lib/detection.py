@@ -20,7 +20,7 @@ def dt_HR(params, hdr, filteredData):
         if params.saveNoise:
             noise = dt_getNoise(candidatesRel,len(energy), params, hdr)
             
-        sStarts, sStops = dt_getDurations(candidatesRel, minGapSamples,len(energy))
+        sStarts, sStops = dt_getDurations(candidatesRel, minGapSamples,len(energy)-1)
         
         cStarts,cStops = dt_HR_expandRegion(params,hdr,sStarts,sStops,energy)
         
@@ -44,10 +44,12 @@ def dt_LR(energy, hdr, buffSamples, startK, stopK, params):
         # add a buffer on either side of detections.
         detStartSample = np.maximum(aboveThreshold - buffSamples, 0)
         detStopSample = np.minimum(aboveThreshold + buffSamples, len(energy)-1)
-
-        detStart = np.maximum(((aboveThreshold - buffSamples)/hdr.fs) + startK, startK)
-        detStop = np.minimum(((aboveThreshold + buffSamples)/hdr.fs) + startK, stopK)
-
+        
+        # [QUESTION] Read index is used here to calculate actual time?
+        # [IMPORTANT] +2 is used to match up the final results
+        detStart = np.maximum(((aboveThreshold+2 - buffSamples)/hdr.fs) + startK, startK)
+        detStop = np.minimum(((aboveThreshold+2 + buffSamples)/hdr.fs) + startK, stopK)
+        
         # Merge flags that are close together.
         if len(detStart) > 1:
             startsM, stopsM = dt_mergeCandidates(buffSamples/hdr.fs, detStop, detStart)
@@ -63,16 +65,17 @@ def dt_LR(energy, hdr, buffSamples, startK, stopK, params):
     return detectionsSample, detectionsSec
 
 
-def dt_buildDirs(param):
+def dt_buildDirs(params):
     # build output directories
     try:
         # use outDir if specified
-        param.metaDir = os.path.join(param.outDir, param.depl+'_'+'metadata')
+        params.metaDir = os.path.join(params.outDir, params.depl+'_'+'metadata')
     except AttributeError:
-        param.metaDir = os.path.join(param.baseDir, param.depl+'_'+'metadata')
+        params.metaDir = os.path.join(params.baseDir, params.depl+'_'+'metadata')
     
-    if not os.path.exists(param.metaDir):
-        os.makedirs(param.metaDir)
+    if not os.path.exists(params.metaDir):
+        os.makedirs(params.metaDir)
+    return params
 
 
 def dt_init_cParams(params):
@@ -129,8 +132,7 @@ def dt_HR_expandRegion(params, hdr, sStarts, sStops, energy):
     N = len(energy)-1
     c_starts = np.zeros(len(sStarts), dtype=int)   # init complete clicks to single/partial clicks
     c_stops = np.zeros(len(sStarts), dtype=int)
-    k=1
-
+    
     dataSmooth = fn_fastSmooth(energy,15)
     thresh = np.percentile(energy,params.energyPrctile,interpolation='nearest')
     # [FUTURE] Parallelize here?
@@ -140,7 +142,6 @@ def dt_HR_expandRegion(params, hdr, sStarts, sStops, energy):
 
         largePeakList = np.sort(np.nonzero(energy[rangeVec] > .5*m))[0]
         midx = rangeVec[largePeakList[0]]
-        
         # [FUTURE] TIME CONSUMING COMPUTATION
         leftmost = 4
         leftIdx = max(midx - 1,leftmost)
@@ -158,8 +159,7 @@ def dt_HR_expandRegion(params, hdr, sStarts, sStops, energy):
         idxs = np.argsort(c_starts)
         c_starts = c_starts[idxs]
         c_stops = c_stops[idxs]
-        c_starts, c_stops = dt_mergeCandidates(params.mergeThr,c_stops,c_starts);
-        # clf;plot(bpDataHi);hold on;plot(dataSmooth,'r');plot([c_starts,c_stops],zeros(size([c_starts,c_stops])),'*g');title(num2str(c_stops - c_starts));
+        c_starts, c_stops = dt_mergeCandidates(params.mergeThr,c_stops,c_starts)
 
     throwIdx = np.zeros(len(c_stops))
     for k2 in range(len(c_stops)):
@@ -171,8 +171,7 @@ def dt_HR_expandRegion(params, hdr, sStarts, sStops, energy):
 
     c_starts = np.delete(c_starts, np.where(throwIdx==1)[0])
     c_stops = np.delete(c_stops, np.where(throwIdx==1)[0])
-    # [WARN] 0 remained in the output array
-    c_starts, c_stops
+
     return c_starts, c_stops
 
 
@@ -210,12 +209,11 @@ def dt_getDurations(detIndices, mergeThreshold, idxMax):
     # start or stop boundary.
     startPositions = np.concatenate([[0], np.nonzero(diffs>mergeThreshold)[0]+1])
     start = detIndices[startPositions]
-    if len(startPositions) > 0:
-        # [QUESTION] -1 or not
+    if len(startPositions) > 1:
         stopPositions = np.concatenate([startPositions[1:]-1, [len(detIndices)-1]])
         stop = detIndices[stopPositions]
     else:
-        stop = np.min(detIndices[startPositions]+1,idxMax)
+        stop = min(detIndices[startPositions]+1,idxMax)
     return start, stop
 
 def dt_prune_cParams(cParams, sIdx):
@@ -591,5 +589,5 @@ def dt_postproc(outFileName, clickTimes, params, hdr, encounterTimes):
 
     clickTimesPruned = clickTimes[delFlag==1] # apply deletions
 
-    np.savetxt(outFileName, clickTimesPruned, fmt='%.5f')
+    np.savetxt(outFileName, clickTimesPruned+0.000005, fmt='%.6f')
     return delFlag
