@@ -145,19 +145,39 @@ High Resolution: Second pass which filters out candidates
   + Further read the paper
   + Experiments with basic signal processing methods
   + Plan to start to project
+
 + 1/26 - 2/3
   + Met with Kait, John and Yoav, discussed project overview
   + Read through Kait's code about detector, replayed her code in Matlab
   + Further read on [AudioFiltering.ipynb](https://github.com/calebmadrigal/FourierTalkOSCON/blob/master/09_AudioFiltering.ipynb)
   + Started translating code into python, (processing header)
+
 + 2/3 - 2/10
   + Get runnable file samples from Kait. (tf is important here)
   + Translated code (finished Header, LR, HR)
   + [Q] Ask prof. how to parallel things
+
 + 2/10-2/18
   + Finished majority translation from .m to .py
   + Got runnable program and similar results
   + Investigated on the time cost for each function 
+
 + 2/18-2/23
   + 2nd check on the click detector outputs
   + Finished the code organization, with runnable py file
+
++ 2/23-3/3
+  + [Choices on how to select filters](https://dsp.stackexchange.com/questions/9467/what-is-the-advantage-of-matlabs-filtfilt)
+  + [Filter Types](https://community.plm.automation.siemens.com/t5/Testing-Knowledge-Base/Introduction-to-Filters-FIR-versus-IIR/ta-p/520959)
+  + Butterworth is one type of IIR, which is typically faster than FIR to achieve the similar results
+
++ 3/3 -3/14
+
+  + Python
+
+    <img src='outputs/runtime_1.png'>
+
+  + Matlab
+
+    <img src='outputs/matlab_runtime_1.png'>
+

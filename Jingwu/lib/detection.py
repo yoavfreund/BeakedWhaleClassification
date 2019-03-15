@@ -67,6 +67,7 @@ def dt_LR(energy, hdr, buffSamples, startK, stopK, params):
 
 def dt_buildDirs(params):
     # build output directories
+    # [TODO] add requirement for depl filename check
     try:
         # use outDir if specified
         params.metaDir = os.path.join(params.outDir, params.depl+'_'+'metadata')
