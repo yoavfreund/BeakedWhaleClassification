@@ -181,3 +181,37 @@ High Resolution: Second pass which filters out candidates
 
     <img src='outputs/matlab_runtime_1.png'>
 
+
+
+| AMI        | CPU  | MEMORY | COST             | 1              | 2              | 3              | 4               | 5    | 6    | 7    |
+| ---------- | ---- | ------ | ---------------- | -------------- | -------------- | -------------- | --------------- | ---- | ---- | ---- |
+| t2.medium  | 2    | 4 GiB  | $0.0464 per Hour | Memory Error   |                |                |                 |      |      |      |
+| t3.large   | 2    | 8 GiB  | $0.0832 per Hour | 21s<br/>40MB/s | 32s<br/>50MB/s | 40s<br/>60MB/s | 58s <br/>55MB/s |      |      |      |
+| a1.xlarge  | 4    | 8 GiB  | $0.102 per Hour  | 26s            | 26s            | 30s            | 37s             |      |      |      |
+| c5.xlarge  | 4    | 8 GiB  | $0.17 per Hour   | 17.5s          | 18s            | 23s            | 27s             | 32s  | 37s  | 42s  |
+| r5d.large  | 2    | 16     |                  | 18s            | 24s            | 36s            | 48s             |      |      |      |
+| c5.2xlarge | 8    | 16     |                  | 17s            | 18s            | 18s            | 18s             |      | 22s  | 24s  |
+
+| Model   | t2.medium | t3.large  | a1.xlarge | c5.xlarge  | r5d.large | c5.2xlarge |
+| ------- | --------- | --------- | --------- | ---------- | --------- | ---------- |
+| CPU     | 2         | 2         | 4         | 4          | 2         | 8          |
+| MEMORY  | 4         | 8         | 8         | 8          | 16        | 16         |
+| COST    | $0.0464/h | $0.0832/h | $0.102/h  | $0.17/h    | $0.144/h  | $0.384/h   |
+| 1 File  | ME        | 40MB/s    | 32MB/s    | 45MB/s     | 44MB/s    | 45MB/s     |
+| 2 Files |           | 50MB/s    | 64MB/s    | 88MB/s     | 67MB/s    | 88MB/s     |
+| 3 Files |           | 60MB/s    | 80MB/s    | 104MB/s    | 67MB/s    | 133MB/s    |
+| 4 Files |           | 55MB/s    | 86MB/s    | 117MB/s    | 67MB/s    | 178MB/s    |
+| 5 Files |           |           | ME        | 125MB/s    |           | 222MB/s    |
+| 6 Files |           |           |           | ME ~130    |           | 218MB/s    |
+| 7 Files |           |           |           | 130MB/s    |           | 233MB/s    |
+| 8 Files |           |           |           |            |           | *          |
+| Best    |           | 0.22 TB/h | 0.30 TB/h | 0.45 TB/h  | 0.24 TB/h | *0.84 TB/h |
+| COST    |           | $0.39 /TB | $0.34 /TB | $0.38 / TB | $0.6 /TB  | *$0.46 /TB |
+
+*: need more data, at least, cost can be cheaper using spot instances
+
+ME: memory error, all the results are rounded. Results are computed from an average of two experiments.
+
+c5.xlarge: computation optimized node
+
+![resources](outputs/resources.png)
