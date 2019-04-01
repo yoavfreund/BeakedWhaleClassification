@@ -20,4 +20,5 @@ runs detector in default settings
 
 ## 5. More
 
-[de_batch.ipynb](<https://github.com/Jingwu010/BeakedWhaleClassification/blob/master/Jingwu/de_batch.ipynb>)
+[de_batch.ipynb](<https://github.com/Jingwu010/BeakedWhaleClassification/blob/master/Jingwu/SPICE-Detector/py_detector/de_batch.ipynb>)
+
