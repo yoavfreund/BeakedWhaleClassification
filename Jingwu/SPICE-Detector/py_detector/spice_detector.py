@@ -1,5 +1,3 @@
-from __future__ import division
-
 import argparse
 import yaml
 import numpy as np
@@ -12,6 +10,14 @@ from lib.functions import *
 from lib.detection import *
 
 def load_config(config_file):
+    """ Load Setting File
+    
+    Args:
+        config_file (string): path of setting file
+    
+    Returns:
+        dict : key value pairs of settings 
+    """
     with open(config_file, 'r') as stream:
         try:
             return yaml.safe_load(stream)
@@ -19,7 +25,15 @@ def load_config(config_file):
             print(exc)
 
 def dt_batch(fullFiles, fullLabels, detParams, encounterTimes, runMode):
-
+    """ Full Detection Cycle 
+    
+    Args:
+        fullFiles (list): A list of input file path
+        fullLabels (list): A list of output file path
+        detParams (type): AnonymousClass of setting values
+        encounterTimes (list): 
+        runMode (string): 
+    """
     N = len(fullFiles)
     detParams.previousFs = 0 # make sure we build filters on first pass
 
@@ -29,9 +43,9 @@ def dt_batch(fullFiles, fullLabels, detParams, encounterTimes, runMode):
     for idx1 in range(N): # for each data file
         params = detParams
         
-        currentRecFile = fullFileNames[idx1]
+        currentRecFile = fullFiles[idx1]
         outFileName = fullLabels[idx1]
-        print 'beginning file %d of %d \n' % (idx1, N)
+        print('\n[dt_batch]:\tbeginning file %d of %d' % (idx1, N))
         start = time.time()
 
         # read file header
@@ -106,9 +120,9 @@ def dt_batch(fullFiles, fullLabels, detParams, encounterTimes, runMode):
                             cParams, sIdx = dt_populate_cParams(clicks, params, clickDets,
                                                                 detectionsSec[iD][0], hdr, sIdx, cParams)
         
-        print 'done with %s\n'%currentRecFile
+        print('[dt_batch]:\tdone with %s'%currentRecFile)
         end = time.time()
-        print round(end-start,2), ' s\n\n'
+        print('[dt_batch]:\t', round(end-start,2), 's\n')
 
         cParams = dt_prune_cParams(cParams,sIdx)
 
@@ -128,11 +142,20 @@ def dt_batch(fullFiles, fullLabels, detParams, encounterTimes, runMode):
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
 
+    print('\n')
+
     parser = argparse.ArgumentParser(description='spice_detector')
-    parser.add_argument('-s', '--setting', action='store', required=True, dest='detParamsFile', help='detector settings file', type=str)
+    parser.add_argument('-s', '--setting', 
+                        action='store',
+                        dest='detParamsFile',
+                        help='detector settings file',
+                        default='settings/settings_detector_xwav_default.yaml',
+                        type=str)
     args = vars(parser.parse_args())
 
     runMode = 'batchRun' # default to batch. Need to implement guiRun.
+
+    print('[DETECTOR]:\tUsing setting file', args['detParamsFile'])
     config = load_config(args['detParamsFile'])
     detParams = type('DetParams',(object,),config)()
 
@@ -142,13 +165,14 @@ if __name__ == "__main__":
     # Right now only wav and xwav files are looked for.
     fullFileNames = fn_findXWAVs(detParams.baseDir, 'x.wav')
 
+    # [TODO] fn_guidedDetection
     encounterTimes = list()
 
     # return a list of files to be built
     fullLabels = fn_getFileset(detParams.metaDir, fullFileNames)
 
     if len(fullFileNames):
-        print 'Beginning detection\n\n'
+        print('[DETECTOR]:\tBeginning detection')
         dt_batch(fullFileNames,fullLabels,detParams,encounterTimes,runMode)
     else:
-        print 'Error: No wav/xwav files found'
+        print('[DETECTOR]: Error: No wav/xwav files found')

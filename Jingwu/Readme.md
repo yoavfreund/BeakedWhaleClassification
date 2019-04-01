@@ -175,13 +175,22 @@ High Resolution: Second pass which filters out candidates
 
   + Python
 
-    <img src='outputs/runtime_1.png'>
+    <img src='imgs/runtime_1.png'>
 
   + Matlab
 
-    <img src='outputs/matlab_runtime_1.png'>
+    <img src='imgs/matlab_runtime_1.png'>
+
++ 3/15 - 4/1
+  + Rewrite code in python3
+  + Add documentation
+  + Clean up files
 
 
+
+
+
+## AWS
 
 | AMI        | CPU  | MEMORY | COST             | 1              | 2              | 3              | 4               | 5    | 6    | 7    |
 | ---------- | ---- | ------ | ---------------- | -------------- | -------------- | -------------- | --------------- | ---- | ---- | ---- |
@@ -214,4 +223,4 @@ ME: memory error, all the results are rounded. Results are computed from an aver
 
 c5.xlarge: computation optimized node
 
-![resources](outputs/resources.png)
+![resources](imgs/resources.png)

@@ -4,22 +4,22 @@ lowResDet: true  # run low resolution detector.
 highResDet: true  # run high resolution detector.
 
 # Location of base directory containing directories of files to be analyzed
-baseDir: '/Users/Jim/Documents/Project/WhaleClassification/WAT_NC_01'
+baseDir: './../input_files'
 
 # Optional output directory location. Metadata directory will be created in 
 # outDir if specified, otherwise it will be created in baseDir.
-outDir: '/Users/Jim/Documents/Project/WhaleClassification/output'
+outDir: './../outputs'
 
 metaDir: ''
 
 # Set transfer function location
-tfFullFile: '/Users/Jim/Documents/Project/WhaleClassification/py_detector/settings/720_130730_invSensit.tf'
+tfFullFile: 'settings/720_130730_invSensit.tf'
 
 # Name of the deployment. This should be the first few characters in the 
 # directory(ies) you want to look in you want to look at. For now, 
 # directory hierarchy is expected to be: basedir>depl*>*.x.wav
 # TODO: implement recursive directory search for more flexibility.
-depl: 'Arctic_C2_10'
+depl: '2019-3-14-1'
 
 channel: 1                  # which channel do you want to look at?
 bpRanges: [5000, 100000]   # Bandpass filter parameters in Hz [min,max]

@@ -1,5 +1,6 @@
-from __future__ import division
-
+"""
+This file contains functions that operate on data file
+"""
 import io
 import os
 import re
@@ -11,8 +12,19 @@ from datetime import datetime
 from datetime import timedelta
 
 def io_readXWavHeader(filename):
+    """Read XWAV file header and return metadata
+    
+    Args:
+        filename (string): xwav file path
+    
+    Returns:
+        hdr (type): AnonymousClass of header metadata
+    
+    Raises:
+        Exception: Unsupported format
+    """
     hdr = type('AnonymousClass',(object,),{})()
-    hdr.fType = 'xwav'
+    hdr.fType = b'xwav'
 
     with open(filename, 'rb') as fh:
         ##################################################
@@ -28,10 +40,10 @@ def io_readXWavHeader(filename):
 
         filesize = os.path.getsize(filename)
         if hdr.xhd.ChunkSize != filesize - 8:
-            raise Exception('Error - incorrect Chunk Size')
+            raise Exception('[WAVIO]:\tError - incorrect Chunk Size')
 
-        if not (hdr.xhd.ChunkID == 'RIFF' and hdr.xhd.Format == 'WAVE'):
-            raise Exception('not wav file - exit')
+        if not (hdr.xhd.ChunkID == b'RIFF' and hdr.xhd.Format == b'WAVE'):
+            raise Exception('[WAVIO]:\tnot wav file - exit')
 
         ##################################################
         # Format Subchunk
@@ -45,8 +57,8 @@ def io_readXWavHeader(filename):
         hdr.xhd.BlockAlign    = struct.unpack('H', fh.read(2))[0]   # # of Bytes per Sample Slice = NumChannels * BitsPerSample / 8
         hdr.xhd.BitsPerSample = struct.unpack('H', fh.read(2))[0]   # of Bits per Sample : 8bit = 8, 16bit = 16, etc
 
-        if not (hdr.xhd.fSubchunkID == 'fmt ' and hdr.xhd.fSubchunkSize == 16):
-            raise Exception('unknown wav format - exit')
+        if not (hdr.xhd.fSubchunkID == b'fmt ' and hdr.xhd.fSubchunkSize == 16):
+            raise Exception('[WAVIO]:\tunknown wav format - exit')
 
         hdr.nBits = hdr.xhd.BitsPerSample       # # of Bits per Sample : 8bit = 8, 16bit = 16, etc
 
@@ -57,10 +69,10 @@ def io_readXWavHeader(filename):
         # HARP Subchunk
         ##################################################
         hdr.xhd.hSubchunkID = struct.unpack('4s', fh.read(4))[0]   # "harp"
-        if hdr.xhd.hSubchunkID == 'data':
-            print 'normal wav file - read data now'
-        elif hdr.xhd.hSubchunkID != 'harp':
-            raise Exception('unsupported wav format:', hdr.xhd.hSubchunkID)
+        if hdr.xhd.hSubchunkID == b'data':
+            print('[WAVIO]:\tnormal wav file - read data now')
+        elif hdr.xhd.hSubchunkID != b'harp':
+            raise Exception('[WAVIO]:\tunsupported wav format:', hdr.xhd.hSubchunkID)
             return
 
         hdr.xhd.hSubchunkSize     = struct.unpack('I', fh.read(4))[0]   # (SizeofSubchunk-8) includes write subchunk
@@ -78,7 +90,7 @@ def io_readXWavHeader(filename):
         hdr.xhd.Reserved          = struct.unpack('8s', fh.read(8))[0]      # Padding to extend subchunk to 64 bytes
 
         if hdr.xhd.hSubchunkSize != (64 - 8 + hdr.xhd.NumOfRawFiles * 32):
-            raise Exception ('Error - HARP SubchunkSize and NumOfRawFiles discrepancy?')
+            raise Exception ('[WAVIO]:\tError - HARP SubchunkSize and NumOfRawFiles discrepancy?')
             return
 
         #####################################################
@@ -133,8 +145,8 @@ def io_readXWavHeader(filename):
         # DATA Subchunk
         #########################################################
         hdr.xhd.dSubchunkID = struct.unpack('4s', fh.read(4))[0]     # "data"
-        if hdr.xhd.dSubchunkID != 'data':
-            raise Exception('hummm, should be "data" here? SubchunkID = ' + hdr.xhd.dSubchunkID)
+        if hdr.xhd.dSubchunkID != b'data':
+            raise Exception('[WAVIO]:\thummm, should be "data" here? SubchunkID = ' + hdr.xhd.dSubchunkID)
 
         hdr.xhd.dSubchunkSize = struct.unpack('I', fh.read(4))[0]    # (Size of Subchunk - 8) includes write subchunk
 
@@ -151,18 +163,29 @@ def io_readXWavHeader(filename):
     return hdr
 
 def io_readWavHeader(filename, dateRegExp):
-        
+    """Read WAV file header and return metadata
+    
+    Args:
+        filename (string): wav file path
+        dateRegExp (string): regrex of date representation in file name 
+    
+    Returns:
+        hdr (type): AnonymousClass of header metadata
+    
+    Raises:
+        Exception: Unsupported format
+    """
     hdr = type('AnonymousClass',(object,),{})()
     hdr.fType = 'wav'
 
     with open(filename, 'rb') as fh:
         # Riff = io_readRIFFCkHdr(f_handle);
         riff, size, fformat = struct.unpack('4sI4s', fh.read(12))
-        if riff != 'RIFF':
-            raise Exception('io:%s is not a RIFF wave file' % filename)
+        if riff != b'RIFF':
+            raise Exception('[WAVIO]:\t:%s is not a RIFF wave file' % filename)
             return 
-        if fformat != 'WAVE':
-            raise Exception('io:%s Riff type not WAVE' % filename)
+        if fformat != b'WAVE':
+            raise Exception('[WAVIO]:\t:%s Riff type not WAVE' % filename)
             return
         
         Chunks = list()
@@ -218,7 +241,7 @@ def io_readWavHeader(filename, dateRegExp):
             hdr.start.dvec = [int(catDate[:4]), int(catDate[4:6]), int(catDate[6:8]),\
                           int(catDate[8:10]), int(catDate[10:12]), int(catDate[12:14])]
         else:
-            raise Exception('Error:%s has wrong date format' % filename)
+            raise Exception('[WAVIO]:\tError:%s has wrong date format' % filename)
             return
         
         hdr.xhd.year    = hdr.start.dvec[0];          # Year
@@ -238,6 +261,14 @@ def io_readWavHeader(filename, dateRegExp):
     return hdr
 
 def io_readRIFFCkHdr(fh):
+    """Read Chunk information from file header
+    
+    Args:
+        fh (file handler): the openning file  
+    
+    Returns:
+        type: AnonymousClass of Chunk metadata
+    """
     # [TODO] handle EOF
     Chunk = type('AnonymousClass',(object,),{})()
     Chunk.StartByte = fh.tell()
@@ -250,6 +281,17 @@ def io_readRIFFCkHdr(fh):
     return Chunk
 
 def io_readRIFFCk_fmt(fh):
+    """Read Fmt information from file header
+    
+    Args:
+        fh (file handler): the openning file  
+    
+    Returns:
+        Fmt (type): AnonymousClass of Fmt metadata
+    
+    Raises:
+        Exception: Unsupported format
+    """
     # Given a handle to a file positioned at the first data byte
     # of a RIFF format chunk, read the format information.
     Fmt = type('AnonymousClass',(object,),{})()
@@ -270,7 +312,7 @@ def io_readRIFFCk_fmt(fh):
         Fmt.fmt.nBitsPerSample = struct.unpack('H', fh.read(2))[0]
         # [TODO] check bytes remaining io_RIFFCk_BytesRemainingP
     else:
-        raise Exception('io:Unsupported codec:  %s', Fmt.wFormatTag)
+        raise Exception('[WAVIO]:\tUnsupported codec:  %s', Fmt.wFormatTag)
         return
     
     # Determine # of bytes per sample
@@ -293,7 +335,7 @@ def io_readRIFFCk_fmt(fh):
         elif Fmt.wFormatTag == 4:
             Fmt.fmt.dtype = 'float' # floating point
         else:
-            raise Exception('io:Unsupported wFormatTag', Fmt.wFormatTag)
+            raise Exception('[WAVIO]:\tUnsupported wFormatTag', Fmt.wFormatTag)
     
     # Handle special case for 24 bit data
     if Fmt.wFormatTag != 3 and Fmt.fmt.nBitsPerSample == 24:
@@ -301,24 +343,33 @@ def io_readRIFFCk_fmt(fh):
     return Fmt
 
 def io_readRaw(fh, hdr, rawNum, channels):
-    # function data = io_readRaw(fh, hdr, rawNum, channels)
-    # Given a handle to an open XWAV file and header information,
-    # retrieve the data in raw file number rawNum.
-    #
-    # When multiple channels are present, only returns the first channel
-    # unless the user specifies which channels should be returned
-    # (e.g. channels 2 and 4: [2 4]).
+    """
+    Given a handle to an open XWAV file and header information
+    retrieve the data in raw file number rawNum
+    
+    Args:
+        fh (file handler): the openning file  
+        hdr (type): header metadata
+        rawNum (int): starting byte of the data chunk
+        channels (int): specific channel of the data from setting file
+    
+    Returns:
+        data (list): a list of bytes in data chunk
+    
+    Raises:
+        Exception: Unsupported format
+    """
     
     # [FUTURE] How to parallel file read?
 
-    if hdr.fType == 'xwav':
+    if hdr.fType == b'xwav':
 
         if hdr.nBits == 16:
             dtype = np.int16
         elif hdr.nBits == 32:
             dtype = np.int32
         else:
-            raise Exception('hdr.nBits = ', hdr.nBits, 'not supported')
+            raise Exception('[WAVIO]:\thdr.nBits = ', hdr.nBits, 'not supported')
             return
         
         

@@ -1,13 +1,25 @@
-from __future__ import division
-
-from functions import fn_fastSmooth
+"""
+This file contains functions that operate on data for click detection
+"""
+from .functions import fn_fastSmooth
 
 import os
 import numpy as np
 from scipy.signal import hilbert
 
 def dt_HR(params, hdr, filteredData):
-
+    """ High Resolution
+    The second pass of signal filtering, expand click regions, select valid clicks
+    
+    Args:
+        params (type): AnonymousClass of setting values
+        hdr (type): AnonymousClass of header metadata
+        filteredData (list): a list of filtered signal data
+    
+    Returns:
+        completeClicks (list): a list of clicks after second pass
+        noise (list): a list of noise
+    """
     # Tyack & Clark 2000 cite Au (1993) in Hearing by Whales & Dolphins, Au
     # (ed.) stating that dolphins can distinguish clicks separated by as
     # little as 205 us.
@@ -28,9 +40,22 @@ def dt_HR(params, hdr, filteredData):
     return completeClicks, noise
 
 def dt_LR(energy, hdr, buffSamples, startK, stopK, params):
-    # Find all events exceeding threshold.
-    # Return times of those events
-    ######################################################################
+    """ Low Resolution
+    Find all events exceeding threshold
+    Return times of those events
+
+    Args:
+        energy (list): a list of energy integers from raw signal data
+        hdr (type): AnonymousClass of header metadata
+        buffSamples (int): a buffer on either side of detections
+        startK (int): data start offset
+        stopK (int): data end offset
+        params (type): AnonymousClass of setting values
+    
+    Returns:
+        detectionsSample (list): a list of detection samples in indexes
+        detectionsSec (list): a list of detection starting and ending seconds
+    """
 
     # Flag times when the amplitude rises above a threshold
     aboveThreshold = np.nonzero(energy>((params.countThresh**2)))[0]
@@ -47,8 +72,8 @@ def dt_LR(energy, hdr, buffSamples, startK, stopK, params):
         
         # [QUESTION] Read index is used here to calculate actual time?
         # [IMPORTANT] +2 is used to match up the final results
-        detStart = np.maximum(((aboveThreshold+2 - buffSamples)/hdr.fs) + startK, startK)
-        detStop = np.minimum(((aboveThreshold+2 + buffSamples)/hdr.fs) + startK, stopK)
+        detStart = np.maximum(((aboveThreshold+1 - buffSamples)/hdr.fs) + startK, startK)
+        detStop = np.minimum(((aboveThreshold+1 + buffSamples)/hdr.fs) + startK, stopK)
         
         # Merge flags that are close together.
         if len(detStart) > 1:
@@ -66,7 +91,15 @@ def dt_LR(energy, hdr, buffSamples, startK, stopK, params):
 
 
 def dt_buildDirs(params):
-    # build output directories
+    """
+    Build output directories according to the input directory from setting values
+    
+    Args:
+        params (type): AnonymousClass of setting values
+    
+    Returns:
+        params (type): AnonymousClass of setting values
+    """
     # [TODO] add requirement for depl filename check
     try:
         # use outDir if specified
@@ -80,7 +113,15 @@ def dt_buildDirs(params):
 
 
 def dt_init_cParams(params):
-    # Initialize vectors for main detector loop
+    """
+    Initialize vectors for main detector loop
+
+    Args:
+        params (type): AnonymousClass of setting values
+    
+    Returns:
+        cParams (type): AnonymousClass of setting values for current loop
+    """
 
     cParams = type('AnonymousClass',(object,),{})()
     n = 10**5
@@ -103,6 +144,16 @@ def dt_init_cParams(params):
 
 
 def dt_chooseSegmentsRaw(hdr):
+    """
+    Divide xwav by raw file and extract raw segments 
+    
+    Args:
+        hdr (type): AnonymousClass of header metadata
+    
+    Returns:
+        startsSec (list): a list of starting seconds
+        stopsSec (list): a list of ending seconds
+    """
     dnum2sec = 60*60*24
     starts = np.array(hdr.raw.dnumStart)
     stops = np.array(hdr.raw.dnumEnd)
@@ -112,8 +163,19 @@ def dt_chooseSegmentsRaw(hdr):
 
 
 def dt_mergeCandidates(mergeThr, stops, starts):
-    # merge candidates that are too close together so they will be considered
-    # to be one larger detection
+    """
+    Merge candidates that are too close together
+    so they will be considered to be one larger detection
+    
+    Args:
+        mergeThr (int): merge threshold
+        stops (list): a list of clicks ending seconds
+        starts (list): a list of clicks starting seconds
+    
+    Returns:
+        starts (list): a list of merged clicks ending seconds
+        stops (list): a list of merged clicks starting seconds
+    """
     c_startsM = []
     c_stopsM = []
     mergeL = 0
@@ -128,7 +190,20 @@ def dt_mergeCandidates(mergeThr, stops, starts):
 
 
 def dt_HR_expandRegion(params, hdr, sStarts, sStops, energy):
-    # Expand region to lower thresholds
+    """
+    Expand region to lower thresholds
+    
+    Args:
+        params (type): AnonymousClass of setting values
+        hdr (type): AnonymousClass of header metadata
+        sStarts (list): a list of clicks starting seconds
+        sStops (list): a list of clicks ending seconds
+        energy (list): a list of energy integers from raw signal data
+    
+    Returns:
+        c_starts (list): a list of expanded clicks starting seconds
+        c_stops (list): a list of expanded clicks ending seconds
+    """
 
     N = len(energy)-1
     c_starts = np.zeros(len(sStarts), dtype=int)   # init complete clicks to single/partial clicks
@@ -177,6 +252,17 @@ def dt_HR_expandRegion(params, hdr, sStarts, sStops, energy):
 
 
 def dt_getNoise(candidatesRel, dataLen, params, hdr):
+    """
+    
+    Args:
+        candidatesRel (list): candidate clicks
+        dataLen (int): length of data samples
+        params (type): AnonymousClass of setting values
+        hdr (type): AnonymousClass of header metadata
+    
+    Returns:
+        noise (list): a list of noise period
+    """
     # Get noise
 
     maxClickSamples = params.clickSampleLims[1]
@@ -191,9 +277,19 @@ def dt_getNoise(candidatesRel, dataLen, params, hdr):
 
 
 def dt_getDurations(detIndices, mergeThreshold, idxMax):
-    # [start, duration] = spDurations(Indices)
-    # Given a vector of indices into another vector, determine
-    # the starting point of each distinct region and how long it is.
+    """
+    Given a vector of indices into another vector,
+    determine the starting point of each distinct region and how long it is
+    
+    Args:
+        detIndices (list): a list of detection indexes
+        mergeThreshold (int): merge threshold
+        idxMax (int): upper limit of index
+    
+    Returns:
+        start (list): a list of expanded clicks starting seconds
+        stop (list): a list of expanded clicks ending seconds
+    """
     
     # [WARN] Careful about the index here
 
@@ -218,7 +314,16 @@ def dt_getDurations(detIndices, mergeThreshold, idxMax):
     return start, stop
 
 def dt_prune_cParams(cParams, sIdx):
-
+    """
+    Prune params by cutting extra space
+    
+    Args:
+        cParams (type): AnonymousClass of setting values for current loop
+        sIdx (int): starting index
+    
+    Returns:
+        cParams (type): AnonymousClass of pruned setting values for current loop
+    """
     eIdx = sIdx
     # prune off any extra cells that weren't filled
     cParams.clickTimes = cParams.clickTimes[:eIdx]
@@ -234,6 +339,19 @@ def dt_prune_cParams(cParams, sIdx):
     return cParams
 
 def dt_processValidClicks(clicks, clickDets, startsK, hdr):
+    """
+    Scan all clicks and extract valid clicks using indexes
+    
+    Args:
+        clicks (list): a list of clicks periods
+        clickDets (list): a list of click indexes
+        startsK (int): click starting time
+        hdr (type): AnonymousClass of header metadata
+    
+    Returns:
+        clkStart (array): a list of valid clicks starting seconds
+        clkEnd (array): a list of valid clicks ending seconds
+    """
     # Write click times to .ctg label file
 
     clkStart = [None] * len(clickDets.clickInd)
@@ -250,6 +368,22 @@ def dt_processValidClicks(clicks, clickDets, startsK, hdr):
     return np.array(clkStart), np.array(clkEnd)
 
 def dt_populate_cParams(clicks, params, clickDets, starts, hdr, sIdx, cParams):
+    """
+    Populate setting values
+    
+    Args:
+        clicks (list): a list of clicks periods
+        params (type): AnonymousClass of default setting values
+        clickDets (list): a list of click indexes
+        starts (list): a list of expanded clicks starting seconds
+        hdr (type): AnonymousClass of header metadata
+        sIdx (int): starting index
+        cParams (type): AnonymousClass of setting values for current loop
+    
+    Returns:
+        cParams (type): AnonymousClass of setting values for current loop
+        sIdx (int): starting index
+    """
     clkStarts, clkEnds = dt_processValidClicks(clicks, clickDets, starts, hdr)
     eIdx = sIdx + len(clickDets.nDur)
     cParams.clickTimes[sIdx:eIdx,0] = clkStarts
@@ -273,8 +407,18 @@ def dt_populate_cParams(clicks, params, clickDets, starts, hdr, sIdx, cParams):
     return cParams, sIdx
 
 def dt_pruneClipping(clicks, params, hdr, filteredData):
-    # Prune out detections that are too high amplitude, and therefore likely
-    # clipped.
+    """
+    Prune out detections that are too high amplitude, and therefore likely clipped
+    
+    Args:
+        clicks (list): a list of clicks periods
+        params (type): AnonymousClass of default setting values
+        hdr (type): AnonymousClass of header metadata
+        filteredData (list): a list of filtered signal data
+    
+    Returns:
+        validClicks (list): a list of valid clicks after pruning
+    """
 
     validClicks = np.ones(len(clicks), dtype=int)  # assume all are good to begin
     for c in range(len(clicks)):
@@ -285,20 +429,33 @@ def dt_pruneClipping(clicks, params, hdr, filteredData):
     return validClicks
 
 def dt_parameters(noiseIn, filteredData, params, clicks, hdr):
-    #Take timeseries out of existing file, convert from normalized data to
-    #counts
-    #1) calculate spectral received levels RL for click and preceding noise:
-    #calculate spectra, account for bin width to reach dB re counts^2/Hz,
-    #add transfer function, compute peak frequency and bandwidth
-    #2) calculate RLpp at peak frequency: find min & max value of timeseries,
-    #convert to dB, add transfer function value of peak frequency (should come
-    #out to be about 9dB lower than value of spectra at peak frequency)
-    #3) Prune out clicks that don't fall in expected peak frequency, 3dB
-    #bandwidth/duration range, or which are not high enough amplitude
-    #(ppSignal)
+    """
+    Compute click parameters to decide if the detection should be kept
+
+    Take timeseries out of existing file, convert from normalized data to counts
+    1) calculate spectral received levels RL for click and preceding noise:
+    calculate spectra, account for bin width to reach dB re counts^2/Hz,
+    add transfer function, compute peak frequency and bandwidth
+    2) calculate RLpp at peak frequency: find min & max value of timeseries,
+    convert to dB, add transfer function value of peak frequency (should come
+    out to be about 9dB lower than value of spectra at peak frequency)
+    3) Prune out clicks that don't fall in expected peak frequency, 3dB
+    bandwidth/duration range, or which are not high enough amplitude (ppSignal)
     # ** There's code in here to compute a noise spectrum alongside the click
     # spectrum. It should at least get you started if you want that sort of
     # thing.
+
+    Args:
+        noiseIn (list): click noise
+        filteredData (list): a list of filtered signal data
+        params (type): AnonymousClass of default setting values
+        clicks (list): a list of clicks periods
+        hdr (type): AnonymousClass of header metadata
+    
+    Returns:
+        clickDets (list): a list of click indexes
+        f: sampling frequency
+    """
 
     ############################################
     # Initialize variables
@@ -501,13 +658,25 @@ def dt_parameters(noiseIn, filteredData, params, clicks, hdr):
 
 
 def dt_postproc(outFileName, clickTimes, params, hdr, encounterTimes):
+    """
+    Step through vector of click times, looking forward and back to throw out
+    solo clicks, and pairs of clicks, if they are too far away from a cluster
+    of clicks with >2 members.
 
-    # Step through vector of click times, looking forward and back to throw out
-    # solo clicks, and pairs of clicks, if they are too far away from a cluster
-    # of clicks with >2 members.
-    # outputs a vector of pruned times, and a vector flagging which members
-    # should be removed from other variables.
-    # Writes pruned times to .pTg file.
+    outputs a vector of pruned times, and a vector flagging which members
+    should be removed from other variables.
+    Writes pruned times to .txt file.
+    
+    Args:
+        outFileName (string): path to output file
+        clickTimes (list): a list of click starting and ending times
+        params (type): AnonymousClass of default setting values
+        hdr (type): AnonymousClass of header metadata
+        encounterTimes (list):
+    
+    Returns:
+        delFlag (list): a list of indexes to be kept after post processing
+    """
 
     delFlag = np.ones(len(clickTimes), dtype=int) # t/f vector of click deletion flags. 
     # starts as all 1 to keep all clicks. Elements switch to zero as clicks are

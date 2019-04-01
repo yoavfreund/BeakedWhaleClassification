@@ -1,5 +1,6 @@
-from __future__ import division
-
+"""
+This file contains functions that support detection process
+"""
 import os
 import math
 import numpy as np
@@ -8,8 +9,17 @@ from scipy import signal
 from scipy.interpolate import interp1d
 
 def fn_findXWAVs(directory, ext):
-    # This function performs a recursive file search.
-    # returns a list of file names ending with extension
+    """ 
+    Performs a recursive file search
+    returns a list of file names ending with extension
+    
+    Args:
+        directory (string): base directory
+        ext (string): specific extension of returning files 
+    
+    Returns:
+        fList (list) : a list of file names ending with extension 
+    """
     
     # [TODO] how to read files when paralleling 
     # [NOT DONE] check for duplicate file names and warn user if found
@@ -22,9 +32,18 @@ def fn_findXWAVs(directory, ext):
     return fList
 
 def fn_buildFilters(params, fs):
-    # On first pass, or if a file has a different sampling rate than the
-    # previous, rebuild the  filter
-    # Start by assuming it's a bandpass filter
+    """ 
+    Build signal filter for bandpassing raw data according to the user settings and sample rate
+    if sampling rate is same as previous, no need to build new filter
+    
+    Args:
+        params (type): AnonymousClass of setting values
+        fs (int): sample rate (frequency)
+    
+    Returns:
+        previousFs (int): previous sample rate (frequency)
+        params (type): AnonymousClass of setting values with filter added
+    """
     bandPassRange = params.bpRanges
     params.filtType = 'bandpass'
     params.filterSignal = True
@@ -69,8 +88,17 @@ def fn_buildFilters(params, fs):
     return previousFs, params
 
 def fn_getFileset(directory, fullFileNames):
-    # Make list of what you're going to name your output files, for easy reference later.
-    # returns a list of same files name but ending up with '.c' redirecting to a directory
+    """ 
+    Make list of what you're going to name your output files, for easy reference later.
+    returns a list of same files name but ending up with '.txt' redirecting to a directory
+
+    Args:
+        directory (string): output directory
+        fullFileNames (list): a list of file names
+    
+    Returns:
+        fullLabels (list): a list of file names with '.txt' ending for storing outputs
+    """
     fullLabels = [None] * len(fullFileNames)
     for i in range(len(fullFileNames)):
         xfile = fullFileNames[i]
@@ -80,7 +108,15 @@ def fn_getFileset(directory, fullFileNames):
     return fullLabels
 
 def fn_interp_tf(params):
-    # If a transfer function is provided, interpolate to desired frequency bins
+    """
+    If a transfer function is provided, interpolate to desired frequency bins
+    
+    Args:
+        params (type): AnonymousClass of setting values
+    
+    Returns:
+        params (type): AnonymousClass of setting values with transfer function values added
+    """
 
     # Determine the frequencies for which we need the transfer function
     params.xfr_f = np.arange((params.specRange[0]-1)*params.binWidth_Hz,\
@@ -96,6 +132,20 @@ def fn_interp_tf(params):
     return params
 
 def fn_tfMap(tf_fname, f_desired=[]):
+    """
+    Given a path to a transfer function file open it and 
+    interpollate to curve to match desired frequency vector.
+    
+    Args:
+        tf_fname (string): transfer function file path
+        f_desired (list, optional): desired frequency vector
+    
+    Returns:
+        uppc: frequencies that match desired frequency vector
+    
+    Raises:
+        Exception: Errors in transfer function
+    """
     f, uppc = np.genfromtxt(tf_fname).T
     
     # [TODO] sum(f_desired ~= f)
@@ -164,13 +214,31 @@ def fn_fastSmooth(Y, w, stype=1, ends=0):
     return SmoothY
 
 def fn_saveDets2pkl(fileName, cParams, f, hdr, params):
+    """
+    Save setting values to pickle file
     
+    Args:
+        fileName (string): output file that stores setting values
+        cParams (type): AnonymousClass of current setting values 
+        f (int): frequency
+        hdr (type): AnonymousClass of header metadata
+        params (type): AnonymousClass of loaded(default) setting values 
+    """
     def anomyousClass_to_dict(anonymousClass):
+        """
+        Convert type to dictionary for pickling
+        
+        Args:
+            anonymousClass (type): AnonymousClass of setting values 
+        
+        Returns:
+            anonymousDict (dict): Dictionary of setting values in key-value pairs
+        """
         # [TODO] a alternative way to dump anonymousClass
         # 1. better way to use pickle dump
         # 2. change the structure of storage, like dict
         anonymousDict = dict()
-        for key, value in vars(anonymousClass).items():
+        for key, value in list(vars(anonymousClass).items()):
             if hasattr(value,'__dict__') or hasattr(value,'__slots__'):
                 anonymousDict[key] = anomyousClass_to_dict(value)
             else:
