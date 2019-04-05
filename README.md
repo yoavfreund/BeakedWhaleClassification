@@ -1,21 +1,52 @@
 # WhaleClassification
+
 Project whose goal is the automatic classification of Whales and Dolphins from recordings of their underwater sounds.  Toothed whales production sterotyped [echolocation clicks](https://en.wikipedia.org/wiki/Animal_echolocation#Toothed_whales) and baleen whales produce sounds that are sometimes called [songs](https://en.wikipedia.org/wiki/Whale_vocalization).  Examples of whale and dolphin sounds can be found at the [Voices in the Sea](http://cetus.ucsd.edu/voicesinthesea_org/). 
 
-## notebooks 
-To be added by Yoav.
+## Notebooks
+
+1. SETUP:
+
+   **[InitialSetup.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/InitialSetup.ipynb)**: Install Git; Clone existing repo; Copy Data.
+
+2. DATA ANALYSIS:
+
+   **[Data_Processing_Whales.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/DSE230_version/Data_Processing_Whales.ipynb)**: includes a detailed description of echo-location clicks data fields, and some sample plots of waveforms and spectra for both species. **Two species generate different waveforms.** **peak2peak** measures the difference between the max and the min of the wave form. **Spectra** is computed from the waveform using FFT. Applying PCA on spectra, the top 5 eigenvectors explain ~85% variances. Still, Overlaps exist on the projection of top eigenvectors of two species. It is not clear how eigenvectors of spectra can be used to distinguish two species.
+
+   **[XGBoost_Whales.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/DSE230_version/XGBoost_Whales.ipynb)**: compares the feature's relative importance among first 10 eigen vectors, rmse and peak2peak of spectra, by fitting into an XGBModel. The **first 2-3 eigenvectors** turn out to be the most important, usually assigned at least ~20% more weights. The ROC Analysis suggests that by abstaining some part of the region in between gave us better classification accuracy.
+
+   > Q:  What are the drawbacks of abstaining crossing area between two species in order to achieve high prediction accuracy?
+
+   **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: introduces **Interclick Interval(ICI)**, the time difference between two clicks within a given bout. **Two species have obvious differences on the overall distribution of ICI**. **Mode** of ICI has more distinguishable distribution than the median of ICI between two species.
+
+3. MODEL
+
+   **[Training and Feature Extraction - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: designs a feature vector which includes **1)PCA projection values of spectra by taking the first 5 eigenvectors,  2) rmse of spectra, 3)peak2peak, and 4)ICI Mode.** The goal is to optimize the prediction accuracy of species with objective function:
+
+   <img src='data/objEqn.gif'>
+
+   Five classification models are applied to truly detected and correctly classified data samples.
+
+   |                   | Logistic Regression | SVM Model | Decision Tree | Random Forest | GB Trees |
+   | ----------------- | :-------------------------: | :---------: | :-------------: | :-------------: | :--------: |
+   | Training Accuracy | 0.8302                    | 0.8303    | 0.8544        | 0.8447        | **0.8574** |
+   | Testing Accuracy  | 0.8301                    | 0.8301    | 0.8542        | 0.8445        | **0.8572** |
+
+   **[Training and Feature Extraction-ICI median.ipynb](https://github.com/yoavfreund/BeakedWhaleClassification/blob/master/Sumit_et_al/Training%20and%20Feature%20Extraction-ICI%20median.ipynb)**: uses all same features except for ICI Median instead of ICI Mode. The classification models produce similar performance regrading to prediction accuracy.
+
+   **[Training and Feature Extraction with Reassigned Labels - ICI Mode, Peak2Peak, RMSE, Eigen.ipynb](https://github.com/GrEedWish/BeakedWhaleClassification/blob/label_based_on_majority_vote/Training%20and%20Feature%20Extraction%20with%20Reassigned%20Labels%20-%20ICI%20Mode%2C%20Peak2Peak%2C%20RMSE%2C%20Eigen.ipynb)**: relabels predicted species according to the ratio for each bout, i.e. all clicks in a specific bout are relabeled to the same species. Using all the same features as the first one except for using relabeled predictions. The accuracy on general classification model raises to ~90%.
 
 ## Data
 Data is stored on two buckets in S3
 
 1. `s3://gulf-whales`: Contains underwaters sound clips of echolocation clicks from two kinds of beaked whales (Cuvier's and Gervais') that were recorded in the Gulf of Mexico after the Deepwater Horizon oil spill. The goal is a binary classification that separates these two species.
    * [Two page description](https://docs.google.com/document/d/1GYivLB5e4xM-URTivAGFOqcjyXp-Ay8s_fyRSTcHvL0/edit#heading=h.lnna1gml3l15)
-
 2. `s3://hdsi-whales`: 4TB of sound data from the Pacific Ocean and 4TB of data from the Atlantic Ocean which were annotated for whale and dolphin sounds for the Marine Mammal Detection, Classification, Localization and Density Estimation Workshops (DCLDE) that were conducted in: 
    * 2015 [7th International DCLDE](http://www.cetus.ucsd.edu/dclde/) which is based on marine mammal sounds in the **Pacific**  
    * 2018 [8th International DCLDE](http://sabiod.univ-tln.fr/DCLDE/) which is based on marine mammal sounds in the **Atlantic** 
    * Listing of files is in `hdsi-whales.ls`
 
 ## Kait Frasier's method
+
 [Kate Frasier](https://www.researchgate.net/profile/Kaitlin_Frasier) recently published a new approach for [Automated classification of dolphin echolocation click types](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005823) based on unsupervised network-based classification that has achieved excellent results for classifiying a variety of species.
 
 ## Proposed Project Steps
