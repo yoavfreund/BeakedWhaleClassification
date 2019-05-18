@@ -48,3 +48,21 @@ def statistics(y_pred, y_test, thr_lower, thr_upper):
     abstain = 1 - np.sum((y_pred < thr_lower) | (y_pred > thr_upper))/len(y_test)
     
     return (y_true+ y_false)/(len(y_test[true_index])+len(y_test[false_index])) , y_true/len(y_test[true_index]), y_false/len(y_test[false_index]), abstain
+
+def margin_CDF(s,l,label=''):
+    """
+    Plot cumulative distribution functions of negative and positive.
+    s: the scores
+    l: the labels (0,1) or (-1,1)
+    """
+    sorder=np.argsort(s)
+    sorted_s=s[sorder]
+    sorted_l=l[sorder]
+    range=max(abs(sorted_s[0]),abs(sorted_s[-1]))
+    sorted_s = sorted_s/range
+    cum_pos = np.cumsum(sorted_l==1)
+    cum_pos =cum_pos/cum_pos[-1]
+    cum_neg = np.cumsum(sorted_l!=1)
+    cum_neg = cum_neg/cum_neg[-1]
+    plt.plot(sorted_s,cum_pos,label="+"+label,c='r')
+    plt.plot(sorted_s,1-cum_neg,label="-"+label,c='b')
